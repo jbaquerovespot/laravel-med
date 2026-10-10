@@ -1,0 +1,171 @@
+{
+  "info": {
+    "name": "FHIR API - Vespot HCE",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/fhir",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "YOUR_TOKEN_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Patient",
+      "item": [
+        {
+          "name": "Search Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Accept", "value": "application/fhir+json"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/Patient?_count=20",
+              "query": [{"key": "_count", "value": "20"}]
+            }
+          }
+        },
+        {
+          "name": "Get Patient by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Accept", "value": "application/fhir+json"}
+            ],
+            "url": "{{base_url}}/Patient/1"
+          }
+        },
+        {
+          "name": "Create Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/fhir+json"},
+              {"key": "Accept", "value": "application/fhir+json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceType\": \"Patient\",\n  \"identifier\": [{\"system\": \"http://hl7.org/fhir/sid/us-ssn\", \"value\": \"123456789\"}],\n  \"name\": [{\"family\": \"Test\", \"given\": [\"Patient\"]}],\n  \"gender\": \"male\",\n  \"birthDate\": \"1990-01-15\"\n}"
+            },
+            "url": "{{base_url}}/Patient"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Encounter",
+      "item": [
+        {
+          "name": "Search Encounters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Accept", "value": "application/fhir+json"}
+            ],
+            "url": "{{base_url}}/Encounter?patient=Patient/1"
+          }
+        },
+        {
+          "name": "Create Encounter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/fhir+json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceType\": \"Encounter\",\n  \"status\": \"finished\",\n  \"class\": {\"code\": \"AMB\", \"display\": \"ambulatory\"},\n  \"subject\": {\"reference\": \"Patient/1\"},\n  \"period\": {\"start\": \"2026-03-17T10:00:00-05:00\"}\n}"
+            },
+            "url": "{{base_url}}/Encounter"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Observation",
+      "item": [
+        {
+          "name": "Search Observations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Accept", "value": "application/fhir+json"}
+            ],
+            "url": "{{base_url}}/Observation?patient=Patient/1&category=vital-signs"
+          }
+        },
+        {
+          "name": "Create Observation (Heart Rate)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/fhir+json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceType\": \"Observation\",\n  \"status\": \"final\",\n  \"code\": {\"coding\": [{\"system\": \"http://loinc.org\", \"code\": \"8867-4\", \"display\": \"Heart rate\"}]},\n  \"subject\": {\"reference\": \"Patient/1\"},\n  \"effectiveDateTime\": \"2026-03-17T10:30:00-05:00\",\n  \"valueQuantity\": {\"value\": 72, \"unit\": \"bpm\"}\n}"
+            },
+            "url": "{{base_url}}/Observation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "RDA",
+      "item": [
+        {
+          "name": "Generate RDA",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Accept", "value": "application/fhir+json"}
+            ],
+            "url": "{{base_url}}/$rda?patient_id=1&encounter_id=1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metadata",
+      "item": [
+        {
+          "name": "CapabilityStatement",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Accept", "value": "application/fhir+json"}
+            ],
+            "url": "{{base_url}}/metadata"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Search Without Token (401)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/Patient"
+          }
+        }
+      ]
+    }
+  ]
+}
